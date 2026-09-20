@@ -6,29 +6,38 @@
 
 Every scam message has a pattern.
 
-> 🎙️ **v2 (HACKDAY 1.0):** Voice-note analysis — upload a WhatsApp .ogg voice note, get transcript + Trust Score.
+> 🎙️ **v2 (built during HACKDAY 1.0):** Voice-note analysis — upload a WhatsApp .ogg voice note, get a transcript + Trust Score.
 
 **Paste any suspicious message → Get a Trust Score with evidence-quoted red flags, scam classification, and a family-friendly Hinglish explainer**
 
-[Live Demo](https://YOUR_VERCEL_URL.vercel.app) · [GitHub Repo](https://github.com/YOUR_USERNAME/scamshield) · [Issues](https://github.com/YOUR_USERNAME/scamshield/issues) · [How It Works](#-how-the-trust-score-works--the-innovation) · [Try the Samples](#-judges-90-second-demo)
+[Live Demo](https://github.com/Himanshu-GenAI/Hackday-1.0) · [GitHub Repo](https://github.com/Himanshu-GenAI/Hackday-1.0) · [Issues](https://github.com/Himanshu-GenAI/Hackday-1.0/issues) · [How It Works](#-how-the-trust-score-works--the-innovation) · [Try the Samples](#-judges-90-second-demo)
 
+![HACKDAY 1.0](https://img.shields.io/badge/HACKDAY_1.0-Tech_for_a_Better_Tomorrow-22C55E)
 ![Next.js](https://img.shields.io/badge/Next.js-App_Router-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?logo=typescript)
 ![AI](https://img.shields.io/badge/AI-Gemini_structured_output-4285F4)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+Built for HACKDAY 1.0 by DECODEP — v2 voice-note analysis built during the live 8-hour window.
+
 </div>
+
+---
+
+## 🌍 Tech for a Better Tomorrow
+
+The tomorrow we're building is one where a parent hangs up on a "digital arrest" call without fear. Where the evidence of a scam is understood the moment its message arrives — not after the money is gone. Where a ₹499 "registration fee" is recognized as the trap it is. ScamShield exists to make that tomorrow ordinary.
 
 ---
 
 ## 📖 Contents
 
-[The Problem](#-the-problem) · [Why Existing Tools Fail](#-why-existing-tools-fail) ·
+[Tech for a Better Tomorrow](#-tech-for-a-better-tomorrow) · [The Problem](#-the-problem) · [Why Existing Tools Fail](#-why-existing-tools-fail) ·
 [Our Solution](#-our-solution) · [How the Trust Score Works](#-how-the-trust-score-works--the-innovation) ·
 [Scam Taxonomy](#-scam-taxonomy-we-detect) · [Architecture](#️-architecture) ·
-[Tech Stack](#️-tech-stack--why) · [Getting Started](#-getting-started) ·
+[Tech Stack](#️-tech-stack---why) · [Getting Started](#-getting-started) ·
 [Judge's 90-Second Demo](#-judges-90-second-demo) · [Roadmap](#️-roadmap) ·
-[Evaluation Mapping](#-evaluation-criteria-mapping) · [Sources](#-research-sources)
+[Evaluation Criteria](#-hackday-10--evaluation-criteria-mapping-weighted) · [Sources](#-research-sources)
 
 ---
 
@@ -69,7 +78,7 @@ India is in the middle of its largest cyber-fraud wave:
 3. **🧬 Scam-type classification** — digital arrest, fake internship, task scam, investment group, and more
 4. **✅ "What to do next"** — concrete steps, incl. reporting via **1930** / cybercrime.gov.in / Chakshu
 5. **👨‍👩‍👧 Family mode** — a forwardable, jargon-free Hinglish explainer for parents
-6. **🎙️ Voice-note analysis** — upload a WhatsApp .ogg voice note, get transcript + Trust Score
+6. **🎙️ v2 (built during HACKDAY 1.0): Voice-note analysis** — upload a WhatsApp .ogg voice note, get transcript + Trust Score
 
 ![ScamShield Landing Page](public/screenshots/landing.png)
 
@@ -95,7 +104,7 @@ Trust = 100 − Risk
 | **1. Rule Engine (18 rules)** | Fees, UPI handles, authority impersonation, urgency, Hinglish keywords | Deterministic, explainable, instant — the backbone |
 | **2. Live Checks (RDAP)** | Domain registration age | Catches fresh scam infrastructure the rules can't see |
 | **3. Gemini (structured JSON)** | Tone, coercion, vagueness, channel mismatch | Catches semantic tricks rules can't — with a strict schema, no hallucinated free text |
-| **🎙️ Voice-note analysis** | Upload a WhatsApp .ogg voice note, get transcript + Trust Score | In-memory multimodal speech-to-text forensics via Gemini `inline_data` |
+| **🎙️ v2 (built during HACKDAY 1.0): Voice-note analysis** | Upload a WhatsApp .ogg voice note, get transcript + Trust Score | In-memory multimodal speech-to-text forensics via Gemini `inline_data` |
 
 **Why hybrid beats a pure LLM:** rules guarantee *consistency and explainability*, the LLM adds *semantic understanding*, live checks catch *fresh infrastructure* — and **every single point deduction is shown to the user with evidence**. No black box.
 
@@ -149,7 +158,7 @@ flowchart TD
     B --> C[Preprocessor: extract URLs, UPI handles, amounts]
     C --> D["Layer 1 — Rule Engine\n18 weighted rules, EN + Hinglish"]
     C --> E["Layer 2 — Live checks\nRDAP domain age"]
-    C --> F["Layer 3 — Gemini 2.0 Flash\nstrict JSON schema"]
+    C --> F["Layer 3 — gemini-2.0-flash\nstrict JSON schema"]
     D --> G["Score Fusion\nTrust = 100 − clamped risk"]
     E --> G
     F --> G
@@ -166,7 +175,7 @@ flowchart TD
 |---|---|---|
 | Framework | Next.js (App Router) + TypeScript strict | One deploy for UI + API; type-safe contracts |
 | Styling | Tailwind CSS | Fast, consistent, dark-theme-first |
-| AI | Gemini 2.0 Flash via REST | Free tier, fast, native structured-JSON (responseSchema) — no SDK lock-in |
+| AI | gemini-2.0-flash via REST | Free tier, fast, native structured-JSON (responseSchema) — no SDK lock-in |
 | Live checks | RDAP (rdap.org) | Free, keyless, authoritative registration data |
 | Rules | Pure TypeScript + regex lexicons | Deterministic, unit-testable, zero cost |
 | Hosting | Vercel | Live demo link, zero-config |
@@ -176,8 +185,8 @@ flowchart TD
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/scamshield.git
-cd scamshield
+git clone https://github.com/Himanshu-GenAI/Hackday-1.0.git
+cd Hackday-1.0
 npm install
 cp .env.example .env.local   # add your GEMINI_API_KEY (free: aistudio.google.com)
 npm run dev                   # → http://localhost:3000
@@ -186,12 +195,12 @@ npm run dev                   # → http://localhost:3000
 **Project structure:**
 
 ```
-├── app/api/analyze/route.ts   # 3-layer fusion pipeline
-├── app/page.tsx               # single-page dark UI
-├── components/                # ScoreGauge · FlagCard · StepsCard · FamilyNote
+├── app/api/analyze/route.ts   # 3-layer fusion pipeline (text + audio)
+├── app/page.tsx               # single-page dark UI with text/voice tabs
+├── components/                # ScoreGauge · FlagCard · StepsCard · FamilyNote · TranscriptCard
 ├── lib/rules/                 # lexicon (18 rules) · engine
 ├── lib/checks/                # entity extraction · RDAP domain age
-├── lib/ai/gemini.ts           # structured-output client
+├── lib/ai/gemini.ts           # structured-output client (text + audio inline_data)
 ├── lib/samples.ts             # one-click demo messages
 └── samples/                   # sample texts (test corpus)
 ```
@@ -226,29 +235,19 @@ npm run dev                   # → http://localhost:3000
 - 📡 **Community Scam Feed** — anonymized trending-pattern radar
 - 🔌 **Open API** — for job platforms to pre-screen postings before students ever see them
 
+> Feasibility note: every roadmap item builds on the existing serverless architecture — no re-architecture required.
+
 ---
 
-## 🏆 Evaluation Criteria Mapping
+## 🏆 HACKDAY 1.0 — Evaluation Criteria Mapping (weighted)
 
-### HackDevengers 2.0
-
-| Criterion | ScamShield |
+| Criterion | Evidence from ScamShield |
 |---|---|
-| Innovation & Originality | Hybrid explainable engine vs. black-box AI tools; Hinglish-first |
-| Problem-Solving | Acts at the message stage — before payment, where other tools arrive too late |
-| Technical Implementation | Weighted rule engine + RDAP integration + schema-constrained LLM fusion |
-| Functionality & UX | Deployed, one-paste flow, animated gauge, evidence-quoted flags, zero login |
-| Impact & Scalability | Targets India's ₹22,000-cr fraud wave; clear platform roadmap |
-
-### HACKDAY 1.0 — Tech for a Better Tomorrow
-
-| Criterion (weight) | ScamShield |
-|---|---|
-| Problem & Impact (25%) | The "better tomorrow" where no one loses savings to a text message |
-| Technical Implementation (25%) | Three-layer engine, strict contracts, graceful degradation |
-| Innovation (20%) | Explainable Trust Score + live domain-age verification |
-| User Experience (15%) | One paste → full verdict; family mode for non-tech users |
-| Feasibility & Scalability (15%) | 100% free-tier stack; extension/bot/API roadmap |
+| **Problem & Impact (25%)** | • ₹22,000+ cr fraud wave; "digital arrest" ₹120+ cr in Q1 2024 alone<br>• Protects students AND their parents<br>• Intervenes at the MESSAGE stage, before payment |
+| **Technical Implementation (25%)** | • 18-rule deterministic weighted engine (EN + Hinglish)<br>• Live RDAP domain-age forensics<br>• Gemini structured-JSON (responseSchema), multimodal text + audio<br>• Score fusion with clamp + floor; graceful degradation |
+| **Innovation (20%)** | • Explainable Trust Score — every deduction quoted from user's own text<br>• Live domain-age checks ("registered 6 days ago")<br>• Voice-note analysis with verbatim transcript<br>• Hinglish-first lexicon |
+| **User Experience (15%)** | • One paste → full verdict; animated gauge<br>• Family mode for non-tech users<br>• Mobile-first verified at 375px; zero login |
+| **Feasibility & Scalability (15%)** | • 100% free-tier serverless stack, already deployed on Vercel<br>• Stateless privacy-first design<br>• Roadmap (extension / bot / open API) builds on existing architecture — no re-architecture |
 
 ---
 
@@ -281,19 +280,19 @@ ScamShield is a risk-assistance and educational tool, not a legal authority. A h
 
 ## 👥 Team
 
-YOUR_NAME / TEAM_NAME
+[Himanshu](https://github.com/Himanshu-GenAI)
 
 ---
 
 ## 🐛 Issues
 
-Report issues and feature requests: [https://github.com/YOUR_USERNAME/scamshield/issues](https://github.com/YOUR_USERNAME/scamshield/issues)
+Report issues and feature requests: [https://github.com/Himanshu-GenAI/Hackday-1.0/issues](https://github.com/Himanshu-GenAI/Hackday-1.0/issues)
 
 ---
 
 ## 🙏 Acknowledgements
 
-Built in 24 hours for HackDevengers 2.0 & HACKDAY 1.0. AI: Google Gemini · Hosting: Vercel.
+Built for HACKDAY 1.0 by DECODEP. AI by Google Gemini · Hosted on Vercel.
 
 ---
 
