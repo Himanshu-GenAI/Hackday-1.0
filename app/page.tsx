@@ -6,6 +6,7 @@ import ScoreGauge from "@/components/ScoreGauge";
 import FlagCard from "@/components/FlagCard";
 import StepsCard from "@/components/StepsCard";
 import FamilyNote from "@/components/FamilyNote";
+import TranscriptCard from "@/components/TranscriptCard";
 import type { RuleHit } from "@/lib/rules/types";
 
 interface AnalysisResult {
@@ -16,6 +17,7 @@ interface AnalysisResult {
   verdict: string;
   next_steps: string[];
   family_note: string;
+  transcript?: string;
   entities: { upi: string[]; amounts: string[] };
 }
 
@@ -34,27 +36,109 @@ const BAND_COLORS: Record<string, string> = {
 };
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<"text" | "audio">("text");
   const [text, setText] = useState("");
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioBase64, setAudioBase64] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (file: File | undefined) => {
+    setError(null);
+    if (!file) return;
+
+    // Validate type
+    const validTypes = [
+      "audio/ogg",
+      "audio/oga",
+      "audio/mp3",
+      "audio/mpeg",
+      "audio/wav",
+      "audio/wave",
+      "audio/x-wav",
+      "audio/m4a",
+      "audio/mp4",
+      "audio/aac",
+      "audio/webm",
+      "audio/flac",
+    ];
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    const validExts = ["ogg", "oga", "mp3", "wav", "m4a", "aac", "webm", "flac"];
+
+    if (
+      !file.type.startsWith("audio/") &&
+      !validTypes.includes(file.type) &&
+      (!ext || !validExts.includes(ext))
+    ) {
+      setError("Please upload a valid audio file (.ogg, .mp3, .wav, .m4a).");
+      return;
+    }
+
+    // Validate size: 15 MB limit
+    const maxBytes = 15 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setError(
+        `File is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Maximum audio file size is 15 MB.`
+      );
+      return;
+    }
+
+    setAudioFile(file);
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+    }
+    setAudioUrl(URL.createObjectURL(file));
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const res = reader.result as string;
+      const base64 = res.includes("base64,") ? res.split("base64,")[1] : res;
+      setAudioBase64(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeAudio = () => {
+    setAudioFile(null);
+    setAudioBase64(null);
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const analyze = async () => {
-    if (!text.trim()) return;
+    if (activeTab === "text" && !text.trim()) return;
+    if (activeTab === "audio" && !audioBase64) return;
+
     setLoading(true);
     setResult(null);
     setError(null);
 
     try {
+      const payload =
+        activeTab === "audio"
+          ? {
+              audio: audioBase64,
+              mimeType: audioFile?.type || "audio/ogg",
+            }
+          : { text };
+
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         setError(data.error ?? "Analysis failed");
         return;
       }
@@ -69,6 +153,7 @@ export default function Home() {
   };
 
   const loadSample = (sampleText: string) => {
+    setActiveTab("text");
     setText(sampleText);
     setResult(null);
     setError(null);
@@ -116,28 +201,114 @@ export default function Home() {
           ))}
         </div>
 
+        {/* ── Segmented Tab Control ───────────────────────────── */}
+        <div className="flex p-1 bg-slate-900 border border-slate-800 rounded-xl mb-4 max-w-xs mx-auto">
+          <button
+            type="button"
+            onClick={() => setActiveTab("text")}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
+              activeTab === "text"
+                ? "bg-violet-600 text-white shadow-sm"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            📝 Paste text
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("audio")}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
+              activeTab === "audio"
+                ? "bg-violet-600 text-white shadow-sm"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            🎙️ Voice note
+          </button>
+        </div>
+
         {/* ── Input card ──────────────────────────────────────── */}
         <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 mb-6">
-          <label htmlFor="message-input" className="sr-only">
-            Paste suspicious message
-          </label>
-          <div className="relative">
-            <textarea
-              id="message-input"
-              ref={textareaRef}
-              rows={7}
-              placeholder="Paste the WhatsApp forward, job offer, email, or SMS here…"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-sm text-slate-100 placeholder:text-slate-500 resize-none focus:outline-none focus:border-violet-500 transition-colors"
-            />
-            <span className="absolute bottom-3 right-3 text-xs text-slate-600">
-              {text.length}
-            </span>
-          </div>
+          {activeTab === "text" ? (
+            <>
+              <label htmlFor="message-input" className="sr-only">
+                Paste suspicious message
+              </label>
+              <div className="relative">
+                <textarea
+                  id="message-input"
+                  ref={textareaRef}
+                  rows={7}
+                  placeholder="Paste the WhatsApp forward, job offer, email, or SMS here…"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-sm text-slate-100 placeholder:text-slate-500 resize-none focus:outline-none focus:border-violet-500 transition-colors"
+                />
+                <span className="absolute bottom-3 right-3 text-xs text-slate-600">
+                  {text.length}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-700/80 rounded-xl bg-slate-950/40 text-center">
+              <input
+                id="voice-file-input"
+                ref={fileInputRef}
+                type="file"
+                accept="audio/*,.ogg,.oga,.mp3,.wav,.m4a"
+                className="sr-only"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  handleFileSelect(file);
+                }}
+              />
+              {!audioFile ? (
+                <>
+                  <label
+                    htmlFor="voice-file-input"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border-2 border-violet-500 text-violet-400 hover:bg-violet-500/10 hover:border-violet-400 transition-colors cursor-pointer"
+                  >
+                    <span>🎙️</span> Choose audio file
+                  </label>
+                  <p className="text-xs text-slate-400 mt-3 max-w-sm leading-relaxed">
+                    Forward the WhatsApp voice note to yourself, save it, upload here (.ogg, .mp3, .wav, .m4a — max 15 MB)
+                  </p>
+                </>
+              ) : (
+                <div className="w-full">
+                  <div className="inline-flex items-center gap-2 max-w-full bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-full text-xs text-slate-200">
+                    <span className="truncate">
+                      🎙️ {audioFile.name} · {(audioFile.size / (1024 * 1024)).toFixed(1)} MB
+                    </span>
+                    <button
+                      type="button"
+                      onClick={removeAudio}
+                      aria-label="Remove audio file"
+                      className="text-slate-400 hover:text-red-400 font-bold ml-1 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  {audioUrl && (
+                    <audio
+                      controls
+                      src={audioUrl}
+                      className="w-full mt-3 h-9 rounded-lg"
+                      preload="metadata"
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             onClick={analyze}
-            disabled={!text.trim() || loading}
+            disabled={
+              loading ||
+              (activeTab === "text" && !text.trim()) ||
+              (activeTab === "audio" && !audioBase64)
+            }
             className="mt-3 w-full py-2.5 rounded-xl font-semibold text-sm bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {loading ? (
@@ -161,18 +332,29 @@ export default function Home() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                   />
                 </svg>
-                Analyzing…
+                {activeTab === "audio" ? "Transcribing & analyzing…" : "Analyzing…"}
               </span>
             ) : (
-              "Analyze message"
+              activeTab === "audio" ? "Analyze voice note" : "Analyze message"
             )}
           </button>
         </div>
 
         {/* ── Error ───────────────────────────────────────────── */}
         {error && (
-          <div className="rounded-2xl bg-red-950/50 border border-red-800/50 p-4 mb-6 text-sm text-red-300">
-            ⚠️ {error}
+          <div className="rounded-2xl bg-red-950/50 border border-red-800/50 p-4 mb-6 text-sm text-red-300 flex items-start justify-between gap-3 animate-fade-in-up">
+            <div className="flex items-center gap-2">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              aria-label="Dismiss error"
+              className="text-red-400 hover:text-red-200 text-xs px-2 py-0.5 rounded cursor-pointer"
+            >
+              ✕
+            </button>
           </div>
         )}
 
@@ -201,6 +383,11 @@ export default function Home() {
         {/* ── Results ─────────────────────────────────────────── */}
         {result && (
           <div className="space-y-4">
+            {/* Transcript card */}
+            {result.transcript && (
+              <TranscriptCard transcript={result.transcript} />
+            )}
+
             {/* Verdict card */}
             <div
               className="rounded-2xl bg-slate-900 border border-slate-800 p-5 flex flex-col sm:flex-row items-center gap-5 opacity-0 animate-fade-in-up"
