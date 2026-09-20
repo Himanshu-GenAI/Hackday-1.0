@@ -202,9 +202,15 @@ export default function Home() {
         </div>
 
         {/* ── Segmented Tab Control ───────────────────────────── */}
-        <div className="flex p-1 bg-slate-900 border border-slate-800 rounded-xl mb-4 max-w-xs mx-auto">
+        <div
+          role="tablist"
+          aria-label="Input mode"
+          className="flex p-1 bg-slate-900 border border-slate-800 rounded-xl mb-4 w-full max-w-xs mx-auto"
+        >
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "text"}
             onClick={() => setActiveTab("text")}
             className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
               activeTab === "text"
@@ -216,6 +222,8 @@ export default function Home() {
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "audio"}
             onClick={() => setActiveTab("audio")}
             className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
               activeTab === "audio"
@@ -342,7 +350,10 @@ export default function Home() {
 
         {/* ── Error ───────────────────────────────────────────── */}
         {error && (
-          <div className="rounded-2xl bg-red-950/50 border border-red-800/50 p-4 mb-6 text-sm text-red-300 flex items-start justify-between gap-3 animate-fade-in-up">
+          <div
+            role="alert"
+            className="rounded-2xl bg-red-950/50 border border-red-800/50 p-4 mb-6 text-sm text-red-300 flex items-start justify-between gap-3 animate-fade-in-up"
+          >
             <div className="flex items-center gap-2">
               <span>⚠️</span>
               <span>{error}</span>
@@ -480,6 +491,9 @@ export default function Home() {
                   const report = [
                     `ScamShield Trust Score: ${result.trust}/100 (${BAND_LABELS[result.band]})`,
                     `Type: ${result.scam_type.replace(/_/g, " ")}`,
+                    ...(result.transcript
+                      ? ["", `Transcript: "${result.transcript}"`]
+                      : []),
                     "",
                     "Red flags:",
                     ...result.flags
