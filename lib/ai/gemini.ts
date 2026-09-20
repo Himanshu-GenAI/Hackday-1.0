@@ -13,7 +13,8 @@ Rules:
 - If the message appears genuine, set scam_type to "genuine" and return an empty ai_signals array.
 - next_steps: 2-4 short, concrete actions. When risk is high, include official reporting:
   call 1930 / visit cybercrime.gov.in.
-- family_note: 1-2 simple sentences in easy Hinglish (Latin script) that a parent can understand.`;
+- family_note: 1-2 simple sentences in easy Hinglish (Latin script) that a parent can understand.
+- transcript: for audio input, verbatim transcription of everything said in the audio; for text input, an empty string "".`;
 
 const RESPONSE_SCHEMA = {
   type: "OBJECT",
@@ -51,8 +52,16 @@ const RESPONSE_SCHEMA = {
     verdict: { type: "STRING" },
     next_steps: { type: "ARRAY", items: { type: "STRING" } },
     family_note: { type: "STRING" },
+    transcript: { type: "STRING" },
   },
-  required: ["scam_type", "ai_signals", "verdict", "next_steps", "family_note"],
+  required: [
+    "scam_type",
+    "ai_signals",
+    "verdict",
+    "next_steps",
+    "family_note",
+    "transcript",
+  ],
 };
 
 export interface GeminiResult {
@@ -61,6 +70,7 @@ export interface GeminiResult {
   verdict: string;
   next_steps: string[];
   family_note: string;
+  transcript: string;
 }
 
 export async function analyzeWithGemini(
@@ -96,9 +106,65 @@ export async function analyzeWithGemini(
     if (!raw) return null;
 
     const parsed: GeminiResult = JSON.parse(raw);
+    if (!parsed.transcript) {
+      parsed.transcript = "";
+    }
     return parsed;
   } catch {
     // Graceful degradation — rules-only mode
+    return null;
+  }
+}
+
+export async function analyzeAudioWithGemini(
+  base64: string,
+  mimeType: string
+): Promise<GeminiResult | null> {
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return null;
+
+    const promptText = `${SYSTEM_PROMPT}\n\nFirst transcribe the audio verbatim (it may be Hindi, Hinglish, or English — transcribe exactly what is said, including filler threats/urgency). Then analyze the transcript as the message to analyze, following all the same rules.`;
+
+    const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                inline_data: {
+                  mime_type: mimeType,
+                  data: base64,
+                },
+              },
+              {
+                text: promptText,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: "application/json",
+          responseSchema: RESPONSE_SCHEMA,
+        },
+      }),
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!raw) return null;
+
+    const parsed: GeminiResult = JSON.parse(raw);
+    if (!parsed.transcript) {
+      parsed.transcript = "";
+    }
+    return parsed;
+  } catch {
     return null;
   }
 }
