@@ -6,6 +6,8 @@
 
 Every scam message has a pattern.
 
+> 🎙️ **v2 (HACKDAY 1.0):** Voice-note analysis — upload a WhatsApp .ogg voice note, get transcript + Trust Score.
+
 **Paste any suspicious message → Get a Trust Score with evidence-quoted red flags, scam classification, and a family-friendly Hinglish explainer**
 
 [Live Demo](https://YOUR_VERCEL_URL.vercel.app) · [GitHub Repo](https://github.com/YOUR_USERNAME/scamshield) · [Issues](https://github.com/YOUR_USERNAME/scamshield/issues) · [How It Works](#-how-the-trust-score-works--the-innovation) · [Try the Samples](#-judges-90-second-demo)
@@ -67,6 +69,7 @@ India is in the middle of its largest cyber-fraud wave:
 3. **🧬 Scam-type classification** — digital arrest, fake internship, task scam, investment group, and more
 4. **✅ "What to do next"** — concrete steps, incl. reporting via **1930** / cybercrime.gov.in / Chakshu
 5. **👨‍👩‍👧 Family mode** — a forwardable, jargon-free Hinglish explainer for parents
+6. **🎙️ Voice-note analysis** — upload a WhatsApp .ogg voice note, get transcript + Trust Score
 
 ![ScamShield Landing Page](public/screenshots/landing.png)
 
@@ -92,6 +95,7 @@ Trust = 100 − Risk
 | **1. Rule Engine (18 rules)** | Fees, UPI handles, authority impersonation, urgency, Hinglish keywords | Deterministic, explainable, instant — the backbone |
 | **2. Live Checks (RDAP)** | Domain registration age | Catches fresh scam infrastructure the rules can't see |
 | **3. Gemini (structured JSON)** | Tone, coercion, vagueness, channel mismatch | Catches semantic tricks rules can't — with a strict schema, no hallucinated free text |
+| **🎙️ Voice-note analysis** | Upload a WhatsApp .ogg voice note, get transcript + Trust Score | In-memory multimodal speech-to-text forensics via Gemini `inline_data` |
 
 **Why hybrid beats a pure LLM:** rules guarantee *consistency and explainability*, the LLM adds *semantic understanding*, live checks catch *fresh infrastructure* — and **every single point deduction is shown to the user with evidence**. No black box.
 
@@ -152,7 +156,7 @@ flowchart TD
     G --> H["UI: animated gauge · evidence-quoted flags\nnext steps · family note"]
 ```
 
-> Privacy by design: stateless pipeline — message text is analyzed and discarded; nothing is persisted.
+> Privacy by design: stateless pipeline — message text and voice notes are analyzed in memory and discarded; nothing is persisted. Audio is transcribed verbatim via Gemini `inline_data` without writing to disk.
 
 ---
 
