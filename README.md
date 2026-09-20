@@ -2,11 +2,13 @@
 
 # 🛡️ ScamShield AI
 
-### Explainable Scam Detection for India's ₹22,000-Crore Fraud Crisis
+### Real-time fraud forensics for Indian messaging — deterministic rule engine, live domain intelligence, explainable AI scoring.
+
+Every scam message has a pattern.
 
 **Paste any suspicious message → Get a Trust Score with evidence-quoted red flags, scam classification, and a family-friendly Hinglish explainer**
 
-[Live Demo](https://scamshield.vercel.app) · [How It Works](#-how-the-trust-score-works--the-innovation) · [Try the Samples](#-judges-90-second-demo)
+[Live Demo](https://YOUR_VERCEL_URL.vercel.app) · [GitHub Repo](https://github.com/YOUR_USERNAME/scamshield) · [Issues](https://github.com/YOUR_USERNAME/scamshield/issues) · [How It Works](#-how-the-trust-score-works--the-innovation) · [Try the Samples](#-judges-90-second-demo)
 
 ![Next.js](https://img.shields.io/badge/Next.js-App_Router-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?logo=typescript)
@@ -65,6 +67,12 @@ India is in the middle of its largest cyber-fraud wave:
 3. **🧬 Scam-type classification** — digital arrest, fake internship, task scam, investment group, and more
 4. **✅ "What to do next"** — concrete steps, incl. reporting via **1930** / cybercrime.gov.in / Chakshu
 5. **👨‍👩‍👧 Family mode** — a forwardable, jargon-free Hinglish explainer for parents
+
+![ScamShield Landing Page](public/screenshots/landing.png)
+
+![ScamShield Scam Verdict](public/screenshots/scam-verdict.png)
+
+![ScamShield Genuine Verdict](public/screenshots/genuine-verdict.png)
 
 > 🔒 **Privacy-first:** messages are analyzed in memory and **never stored**. No login. No tracking.
 
@@ -164,7 +172,7 @@ flowchart TD
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/yourusername/scamshield.git
+git clone https://github.com/YOUR_USERNAME/scamshield.git
 cd scamshield
 npm install
 cp .env.example .env.local   # add your GEMINI_API_KEY (free: aistudio.google.com)
@@ -269,7 +277,13 @@ ScamShield is a risk-assistance and educational tool, not a legal authority. A h
 
 ## 👥 Team
 
-[Your Name] — [role] · [teammates]
+YOUR_NAME / TEAM_NAME
+
+---
+
+## 🐛 Issues
+
+Report issues and feature requests: [https://github.com/YOUR_USERNAME/scamshield/issues](https://github.com/YOUR_USERNAME/scamshield/issues)
 
 ---
 
